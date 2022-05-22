@@ -1,24 +1,47 @@
-import logo from './logo.svg';
-import './App.css';
+import React, {useEffect, useState} from "react";
+import Navbar from "./components/Navbar";
+import Characters from "./components/Characters";
+import Pagination from "./components/Pagination";
+import Footer from "./components/Footer";
 
 function App() {
+
+  const [characters, setCharacters] = useState([])
+  const [paginate, SetPaginate] = useState({});
+
+  const InitialUrl = "https://rickandmortyapi.com/api/character";
+
+  const fetchCharacters = (url) => {
+    fetch(url)
+    .then(response => response.json())
+    .then(response => {
+      setCharacters(response.results);
+      SetPaginate(response.info);
+    })
+    .catch(err => console.log(err))
+  };
+
+  const onPrevious = () => {
+    fetchCharacters(paginate.prev);
+  };
+  const onNext = () => {
+    fetchCharacters(paginate.next);
+  };
+
+  useEffect(() => {
+    fetchCharacters(InitialUrl);
+  }, []);
+  
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <Navbar />
+      <div className="container">
+        <Pagination prev={paginate.prev} next={paginate.next} onPrevious={onPrevious} onNext={onNext} />
+        <Characters characters={characters} />
+      </div>
+      <Footer />
+    </>
   );
 }
 
